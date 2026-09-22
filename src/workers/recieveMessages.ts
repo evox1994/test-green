@@ -23,9 +23,10 @@ const startPolling = (idInstance: string, apiTokenInstance: string) => {
       }
 
       self.postMessage({
+        chatId: response.data.body.senderData.chatId,
         id: response.data.body.idMessage,
         message: response.data.body.messageData.textMessageData.textMessage,
-        date: response.data.body.timestamp,
+        date: new Date(response.data.body.timestamp * 1000),
         type: 'incoming',
       });
 
@@ -35,7 +36,7 @@ const startPolling = (idInstance: string, apiTokenInstance: string) => {
     }
   };
 
-  interval = setInterval(getMessage, 5000);
+  interval = setInterval(getMessage, 10000);
   getMessage();
 };
 

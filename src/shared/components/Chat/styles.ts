@@ -26,6 +26,7 @@ export const Title = styled(Typography)(() => ({
 export const ChatBody = styled(Box)(() => ({
   display: 'flex',
   flexDirection: 'column-reverse',
+  alignItems: 'flex-start',
   width: '100%',
   flex: 1,
   gap: '5px',

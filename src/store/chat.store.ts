@@ -146,11 +146,14 @@ export class ChatStore {
       if (chat.id !== chatId) {
         return chat;
       }
-
-      return {
+      const updatedChat = {
         ...chat,
-        messages: chat.messages.concat([message]),
+        messages: chat.messages.concat([message]).sort((a, b) => +b.date - +a.date),
       };
+
+      this.selectedChat = updatedChat;
+
+      return updatedChat;
     });
   };
 }
