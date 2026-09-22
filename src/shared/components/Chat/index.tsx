@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import { type FC } from 'react';
 import { ChatBody, ChatFooter, ChatHeader, ChatInput, Container, Title } from './styles';
 import { observer } from 'mobx-react-lite';
 import { IconButton, InputAdornment } from '@mui/material';
@@ -12,6 +12,9 @@ import { Message } from './components';
 export const Chat: FC = observer(() => {
   const { control, handleSubmit, reset } = useForm({
     resolver: yupResolver(schema),
+    defaultValues: {
+      message: '',
+    },
   });
   const { selectedChat, isSendingMessage, sendMessage, resetChat } = useChatStore();
 

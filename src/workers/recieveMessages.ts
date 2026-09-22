@@ -15,7 +15,7 @@ const startPolling = (idInstance: string, apiTokenInstance: string) => {
     return;
   }
 
-  interval = setInterval(async () => {
+  const getMessage = async () => {
     try {
       const response = await api.get(`/waInstance${idInstance}/receiveNotification/${apiTokenInstance}`);
       if (!response.data) {
@@ -33,7 +33,10 @@ const startPolling = (idInstance: string, apiTokenInstance: string) => {
     } catch (e) {
       console.error(e);
     }
-  }, 5000);
+  };
+
+  interval = setInterval(getMessage, 5000);
+  getMessage();
 };
 
 const stopPolling = () => {
@@ -44,7 +47,6 @@ const stopPolling = () => {
 };
 
 self.onmessage = (event: MessageEvent<RecieveWorkerPayload>) => {
-  console.log(event);
   const { type, apiTokenInstance, idInstance } = event.data;
 
   if (type === 'start') {

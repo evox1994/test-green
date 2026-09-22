@@ -11,7 +11,7 @@ export class AuthStore {
     const apiToken = localStorage.getItem('apiToken');
     if (id && apiToken) {
       this.idInstance = id;
-      this.apiTokenInstance = id;
+      this.apiTokenInstance = apiToken;
     }
   }
 
@@ -22,5 +22,7 @@ export class AuthStore {
   setAuthValues = ({ id, token }: SetAuthPayload) => {
     this.idInstance = id;
     this.apiTokenInstance = token;
+    localStorage.setItem('id', id);
+    localStorage.setItem('apiToken', token);
   };
 }

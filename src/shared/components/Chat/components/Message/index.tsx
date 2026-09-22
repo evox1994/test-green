@@ -1,7 +1,8 @@
 import type { FC, ReactNode } from 'react';
 import { format } from 'date-fns';
-import { Container, SendTime } from './styles';
 import clsx from 'clsx';
+import { Typography } from '@mui/material';
+import { Container, SendTime } from './styles';
 
 interface Props {
   children: ReactNode;
@@ -15,7 +16,7 @@ export const Message: FC<Props> = ({ type, date, children }) => {
   return (
     <Container className={clsx({ outgoing: isOutgoing })}>
       <SendTime className={clsx({ outgoing: isOutgoing })}>{format(date, 'HH:mm')}</SendTime>
-      {children}
+      <Typography>{children}</Typography>
     </Container>
   );
 };

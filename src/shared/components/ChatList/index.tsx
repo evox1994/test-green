@@ -9,8 +9,11 @@ import { AddButton, AddChatForm, AddChatInput, Container, List, ListItem, Title 
 import { schema } from './schema';
 
 export const ChatList: FC = observer(() => {
-  const { control, handleSubmit } = useForm({
+  const { control, handleSubmit, reset } = useForm({
     resolver: yupResolver(schema),
+    defaultValues: {
+      phone: '',
+    },
   });
   const { chats, selectedChat, getChats, selectChat, addChat } = useChatStore();
 
@@ -20,6 +23,7 @@ export const ChatList: FC = observer(() => {
 
   const handleAddChat = handleSubmit(({ phone }) => {
     addChat(phone);
+    reset();
   });
 
   useEffect(() => {

@@ -11,7 +11,7 @@ export const ChatPage: FC = observer(() => {
   const { addMessage } = useChatStore();
 
   useEffect(() => {
-    workerRef.current = new Worker('../../workers/recieveMessages.ts');
+    workerRef.current = new Worker(new URL('../../workers/recieveMessages.ts', import.meta.url), { type: 'module' });
 
     workerRef.current.onmessage = (event: MessageEvent<IncomingMessagePayload>) => {
       const { chatId, ...message } = event.data;

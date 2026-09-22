@@ -35,18 +35,22 @@ export class ChatStore {
       const response = await api.post(`/waInstance${idInstance}/sendMessage/${apiTokenInstance}`, { chatId, message });
       runInAction(() => {
         this.chats = this.chats.map((chat) => {
-          if (chat.id == chatId) {
-            return {
+          if (chat.id === chatId) {
+            const updatedChat = {
               ...chat,
-              messages: chat.messages.concat([
-                {
-                  id: response.data.idMessage,
-                  message,
-                  date: new Date(),
-                  type: 'outgoing',
-                },
-              ]),
+              messages: chat.messages
+                .concat([
+                  {
+                    id: response.data.idMessage,
+                    message,
+                    date: new Date(),
+                    type: 'outgoing',
+                  },
+                ])
+                .sort((a, b) => +b.date - +a.date),
             };
+            this.selectedChat = updatedChat;
+            return updatedChat;
           }
 
           return chat;
@@ -58,12 +62,36 @@ export class ChatStore {
     }
   };
 
-  selectChat = (id: string) => {
-    const chat = this.chats.find((chat) => chat.id === id);
+  selectChat = async (id: string) => {
+    const { idInstance, apiTokenInstance } = this.authStore;
+    const response = await api.post(`/waInstance${idInstance}/getChatHistory/${apiTokenInstance}`, { chatId: id });
 
-    if (chat) {
-      this.selectedChat = chat;
+    if (!response.data) {
+      return;
     }
+
+    runInAction(() => {
+      this.chats = this.chats.map((chat) => {
+        if (chat.id !== id) {
+          return chat;
+        }
+
+        return {
+          ...chat,
+          messages: response.data.map((m: any) => ({
+            id: m.idMessage,
+            message: m.textMessage,
+            date: new Date(m.timestamp * 1000),
+            type: m.type,
+          })),
+        };
+      });
+
+      const chat = this.chats.find((c) => c.id === id);
+      if (chat) {
+        this.selectedChat = chat;
+      }
+    });
   };
 
   resetChat = () => {
@@ -78,23 +106,13 @@ export class ChatStore {
     try {
       const { idInstance, apiTokenInstance } = this.authStore;
       const response = await api.get(`/waInstance${idInstance}/getChats/${apiTokenInstance}`);
-      this.chats = await Promise.all(
-        response.data.map(async (chat: any) => {
-          // Получение первых 100 сообщений и последующие нужно получать при скролле, но реализацию загрузки при скролле не делал т.к. это тестовое
-          const res = await api.post(`/waInstance${idInstance}/getChatHistory/${apiTokenInstance}`);
-
-          return {
-            id: chat.id,
-            name: chat.name,
-            messages: res.data.map((m: any) => ({
-              id: m.idMessage,
-              message: m.textMessage,
-              date: new Date(m.timestamp),
-              type: m.type,
-            })),
-          };
-        }),
-      );
+      this.chats = response.data.map((chat: any) => {
+        return {
+          id: chat.chatId,
+          name: chat.name,
+          messages: [],
+        };
+      });
     } catch (e) {
       console.error(e);
     }
@@ -109,7 +127,6 @@ export class ChatStore {
     const { exist, chatId } = response.data;
 
     if (this.chats.find((c) => c.id === chatId) || !exist) {
-      console.log('return');
       return;
     }
 
